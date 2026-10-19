@@ -1,0 +1,13 @@
+# Build output
+bin/
+build/
+
+# Visual Studio local cache and per-user settings
+.vs/
+*.user
+
+# Default VS output folders (in case a configuration still uses them)
+x64/
+x86/
+Debug/
+Release/

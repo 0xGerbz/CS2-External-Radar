@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="CS2 Radar/CS2 Radar.vcxproj" Id="ef81f76d-15de-45b5-ac32-caa409cbfc87" />
+</Solution>

@@ -1,0 +1,1 @@
+//This file will contain all offsets needed for reading memory
