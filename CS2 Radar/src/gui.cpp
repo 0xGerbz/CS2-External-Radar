@@ -97,7 +97,7 @@ void gui::Render() {
 		ImVec2 display = ImGui::GetIO().DisplaySize;
 		//Set the window position x grows from left to right and y grows from TOP TO BOTTOM - kind of weird
 		ImGui::SetNextWindowPos(ImVec2(display.x - btnSize.x - margin, margin));
-		//Style options we can use. here we are turning of any border/padding on the button window
+		//Style options we can use. here we are turning setting a border and turning off padding on the button window
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 		//Every imgui window/element will begin with a ImGui::Begin() call and end with ImGui::End()
