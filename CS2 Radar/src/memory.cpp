@@ -7,14 +7,16 @@ namespace memory {
 
 	//attach to our process
 	bool attachToProcess() {
+		//We will use the window handle find the processID
 		windowHandle = FindWindowW(nullptr, L"CS2.exe");
 		if(windowHandle) GetWindowThreadProcessId(windowHandle, &processID);
+		//We need a process handle to read memory from the process
 		processHandle = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, processID);
 		if (processHandle == nullptr) return false;
 		return true;
 	}
 
-	//Find the module base of the given process/module
+	//Find the module base of the given process/module - I used examples from Stack Overflow and AI to assist me with this function
 	uintptr_t getModuleBase(wchar_t* moduleName) {
 		HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32,GetProcessId(processHandle));
 		MODULEENTRY32W entry{};
@@ -45,8 +47,8 @@ namespace memory {
 	template<typename T>
 	T memRead(uintptr_t address) {
 		T value{};
-		if (memRead(address, &value, sizeof(T)) != sizeof(T))
-			return T{};
+		//If we don't read in the specified number of bytes return empty type object
+		if (memRead(address, &value, sizeof(T)) != sizeof(T)) return T{};
 		return value;
 	}
 }
