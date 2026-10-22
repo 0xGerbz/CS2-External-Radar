@@ -90,6 +90,37 @@ void gui::Render() {
         //     gameloop
         // }
 
+		//Simple exit button example
+		//Define our size and margin(how far from the edge of the screen we want it)
+		const ImVec2 btnSize(100, 30);
+		const float margin = 10.0f;
+		ImVec2 display = ImGui::GetIO().DisplaySize;
+		//Set the window position x grows from left to right and y grows from TOP TO BOTTOM - kind of weird
+		ImGui::SetNextWindowPos(ImVec2(display.x - btnSize.x - margin, margin));
+		//Style options we can use. here we are turning of any border/padding on the button window
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		//Every imgui window/element will begin with a ImGui::Begin() call and end with ImGui::End()
+		ImGui::Begin("ExitButton", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
+		//we have to call popstyle var to reset to default after we changed the style variable in lines 101-102
+		ImGui::PopStyleVar();
+		//Set colors for the button
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.10f, 0.10f, 1.0f)); // normal
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.30f, 0.30f, 0.30f, 1.0f)); // hovered
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.20f, 0.20f, 1.0f)); // held down
+		//Make our button, will say exit
+		if (ImGui::Button("Exit", btnSize)) {
+			done = true;
+		}
+		//Pop colors
+		ImGui::PopStyleColor(3);
+		//End our window
+		ImGui::End();
+
+
+
+
+
 		ImGui::Render();
 		const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
 		g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);

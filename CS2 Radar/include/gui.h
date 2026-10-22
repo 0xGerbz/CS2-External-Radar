@@ -76,7 +76,6 @@ namespace maps {
 }
 //Similar to the maps, this holds our weapon/inventory icons
 namespace icons {
-	extern int id;
 	extern float scale;
 	extern std::unordered_map<int, ID3D11ShaderResourceView*> iconTextures;
 	extern std::unordered_map<int, int> iconWidths;

@@ -169,6 +169,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\memory.cpp" />
     <ClCompile Include="src\resources.cpp" />
     <ClCompile Include="src\WICTextureLoader11.cpp" />
   </ItemGroup>

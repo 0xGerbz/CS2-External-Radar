@@ -22,6 +22,7 @@
     <ClCompile Include="include\ImGUI\imgui_impl_win32.cpp" />
     <ClCompile Include="include\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="include\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="src\memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ImGUI\imconfig.h">
