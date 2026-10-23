@@ -90,6 +90,7 @@ void gui::Render() {
         //     gameloop
         // }
 
+
 		//Simple exit button example
 		//Define our size and margin(how far from the edge of the screen we want it)
 		const ImVec2 btnSize(100, 30);
@@ -116,10 +117,23 @@ void gui::Render() {
 		ImGui::PopStyleColor(3);
 		//End our window
 		ImGui::End();
+		ImGui::PopStyleVar();
+	
+		// Messing around with some imgui stuff to see what we can do. This is just a test window
+		// Where the radar window will start.
+		ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
 
+		// Radar window a starting size.
+		ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
 
+		// Title of box
+		ImGui::Begin("Radar");
 
+		// Temporary text
+		ImGui::Text("Map will go here.");
 
+		// Every Begin() needs a matching End().
+		ImGui::End();
 
 		ImGui::Render();
 		const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
