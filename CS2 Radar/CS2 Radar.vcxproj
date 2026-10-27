@@ -164,6 +164,7 @@
     <ClCompile Include="include\ImGUI\imgui_impl_win32.cpp" />
     <ClCompile Include="include\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="include\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\gui.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -174,6 +175,7 @@
     <ClCompile Include="src\WICTextureLoader11.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\game.h" />
     <ClInclude Include="include\gui.h" />
     <ClInclude Include="include\ImGUI\imconfig.h" />
     <ClInclude Include="include\ImGUI\imgui.h" />
