@@ -1,55 +1,36 @@
 #include "gui.h"
 
-namespace gui {
-	ID3D11Device* g_pd3dDevice = NULL;
-	ID3D11DeviceContext* g_pd3dDeviceContext = NULL;
-	IDXGISwapChain* g_pSwapChain = NULL;
-	UINT g_ResizeWidth = 0, g_ResizeHeight = 0;
-	ID3D11RenderTargetView* g_mainRenderTargetView = NULL;
-	bool exitRequested = false;
-	WNDCLASSEXW wc = {};
-	HWND hwnd = NULL;
-
+//Constructors
+GUI::GUI() {
+	g_pd3dDevice = NULL;
+	g_pd3dDeviceContext = NULL;
+	g_pSwapChain = NULL;
+	g_mainRenderTargetView = NULL;
+	exitRequested = false;
+	wc = {};
+	hwnd = NULL;
 }
+//We have to declare this globaly for our WndProc function
+UINT GUI::g_ResizeWidth = 0;
+UINT GUI::g_ResizeHeight = 0;
 
-namespace maps {
-	//You can change radar size based on your resolution. Set at 1080p right now for 1920x1080
-	float radarSize = 1080;
-	float vertigoZBound = 11700;
-	float nukeZBound = -495;
-	std::unordered_map<std::string, ID3D11ShaderResourceView*> mapTextures;
-	std::unordered_map<std::string, mapData> mapBounds;
-}
-
-namespace icons {
-	int id;
-	float scale = 0.4f;
-	std::unordered_map<int, ID3D11ShaderResourceView*> iconTextures;
-	std::unordered_map<int, int> iconWidths;
-	std::unordered_map<int, int> iconHeights;
-}
-
-mapData::mapData() {
-	xBound = 0.0f;
-	yBound = 0.0f;
-	scale = 0.0f;
-}
-
-mapData::mapData(float x, float y, float s) {
-	xBound = x;
-	yBound = y;
+map::map(float x, float y, float s, ID3D11ShaderResourceView* t) {
+	xOffset = x;
+	yOffset = y;
 	scale = s;
+	texture = t;
 }
 
-
+icon::icon(ID3D11ShaderResourceView* t) {
+	texture = t;
+}
 
 //All of our rendering
-void gui::Render() {
+void GUI::Render() {
 	ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.f);
-	//game = new CGame;
-	loadTextures();
-	loadMapBounds();
-	// Main loop
+	loadMaps();
+	loadIcons();
+	// Main loop - the structure of the main loop is given in the imgui example
 	bool done = false;
 	while (!done)
 	{
@@ -118,7 +99,8 @@ void gui::Render() {
 		//End our window
 		ImGui::End();
 		ImGui::PopStyleVar();
-	
+
+
 		// Messing around with some imgui stuff to see what we can do. This is just a test window
 		// Where the radar window will start.
 		ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
@@ -135,6 +117,7 @@ void gui::Render() {
 		// Every Begin() needs a matching End().
 		ImGui::End();
 
+		//Render - given in imgui example
 		ImGui::Render();
 		const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
 		g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
@@ -146,7 +129,7 @@ void gui::Render() {
 	}
 
 
-	// Cleanup
+	// Cleanup - given in imgui example
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
@@ -157,11 +140,8 @@ void gui::Render() {
 	return;
 }
 
-
-
-
 //Loading images
-ID3D11ShaderResourceView* gui::LoadImageTexture(ID3D11Device* device, const wchar_t* filename)
+ID3D11ShaderResourceView* GUI::LoadImageTexture(ID3D11Device* device, const wchar_t* filename)
 {
 	ID3D11ShaderResourceView* texture = nullptr;
 
@@ -180,46 +160,15 @@ ID3D11ShaderResourceView* gui::LoadImageTexture(ID3D11Device* device, const wcha
 
 	return texture;
 }
-ID3D11ShaderResourceView* gui::LoadImageTexture(ID3D11Device* device, const wchar_t* filename, int* outWidth, int* outHeight)
-{
-	ID3D11ShaderResourceView* texture = nullptr;
-	ID3D11Resource* resource = nullptr;
-
-	HRESULT hr = DirectX::CreateWICTextureFromFile(
-		device,
-		filename,
-		&resource,
-		&texture
-	);
-
-	if (FAILED(hr))
-		return nullptr;
-
-	if (resource && outWidth && outHeight)
-	{
-		ID3D11Texture2D* tex2D = nullptr;
-		if (SUCCEEDED(resource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&tex2D)))
-		{
-			D3D11_TEXTURE2D_DESC desc;
-			tex2D->GetDesc(&desc);
-			*outWidth = (int)desc.Width;
-			*outHeight = (int)desc.Height;
-			tex2D->Release();
-		}
-		resource->Release();
-	}
-
-	return texture;
-}
 
 
 //Helpers - All of the following functions are given in imgui example
 //Init
-void gui::initializeGUI() {
+void GUI::initializeGUI() {
 	// Create application window
 	wc = { sizeof(wc), CS_VREDRAW | CS_HREDRAW, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"CS2 Radar", nullptr };
 	::RegisterClassExW(&wc);
-	gui::hwnd = ::CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, L"CS2 Radar", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, wc.hInstance, nullptr);
+	hwnd = ::CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, L"CS2 Radar", WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, wc.hInstance, nullptr);
 
 	// Initialize Direct3D
 	if (!CreateDeviceD3D(hwnd))
@@ -247,7 +196,7 @@ void gui::initializeGUI() {
 	ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
 }
-bool gui::CreateDeviceD3D(HWND hWnd){
+bool GUI::CreateDeviceD3D(HWND hWnd){
 	// Setup swap chain
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
@@ -278,23 +227,23 @@ bool gui::CreateDeviceD3D(HWND hWnd){
 	CreateRenderTarget();
 	return true;
 }
-void gui::CleanupDeviceD3D(){
+void GUI::CleanupDeviceD3D(){
 	CleanupRenderTarget();
 	if (g_pSwapChain) { g_pSwapChain->Release(); g_pSwapChain = nullptr; }
 	if (g_pd3dDeviceContext) { g_pd3dDeviceContext->Release(); g_pd3dDeviceContext = nullptr; }
 	if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = nullptr; }
 }
-void gui::CreateRenderTarget(){
+void GUI::CreateRenderTarget(){
 	ID3D11Texture2D* pBackBuffer;
 	g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
 	g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView);
 	pBackBuffer->Release();
 }
-void gui::CleanupRenderTarget(){
+void GUI::CleanupRenderTarget(){
 	if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = nullptr; }
 }
 //Handles resizing, minimizing, exiting window
-LRESULT WINAPI gui::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
+LRESULT WINAPI GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 		return true;
 

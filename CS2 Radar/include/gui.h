@@ -13,72 +13,63 @@
 // Forward declare message handler from imgui_impl_win32.cpp - given in imgui example
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-namespace gui {
+//The offsets and scale are values we can find in game to normalize our world position. We subtract these values and divide them by the scale to convert our position.
+struct map {
+	float xOffset;
+	float yOffset;
+	float scale;
+
+	ID3D11ShaderResourceView* texture;
+
+	//constructors
+	map() : xOffset(0.0f), yOffset(0.0f), scale(0.0f), texture(nullptr) {}
+	map(float x, float y, float s, ID3D11ShaderResourceView* t);
+};
+
+struct icon {
+	ID3D11ShaderResourceView* texture;
+
+	//constructors
+	icon() : texture(nullptr) {}
+	icon(ID3D11ShaderResourceView* t);
+};
+
+struct GUI {
 	// Data - given in imgui example
-	extern ID3D11Device* g_pd3dDevice;
-	extern ID3D11DeviceContext* g_pd3dDeviceContext;
-	extern IDXGISwapChain* g_pSwapChain;
-	extern UINT g_ResizeWidth, g_ResizeHeight;
-	extern ID3D11RenderTargetView* g_mainRenderTargetView;
-	extern bool exitRequested;
-	extern WNDCLASSEXW wc;
-	extern HWND hwnd;
+	ID3D11Device* g_pd3dDevice;
+	ID3D11DeviceContext* g_pd3dDeviceContext;
+	IDXGISwapChain* g_pSwapChain;
+	static UINT g_ResizeWidth;
+	static UINT	g_ResizeHeight;
+	ID3D11RenderTargetView* g_mainRenderTargetView;
+	bool exitRequested;
+	WNDCLASSEXW wc;
+	HWND hwnd;
+
+	//unordered map to hold our map objects - the key for our map is the string name, and the key for our icons is its' ID
+	std::unordered_map<std::string, map> maps;
+	std::unordered_map<int, icon> icons;
+	//Constructor
+	GUI();
 
 	//Helper Function Declarations - given in imgui example
 	bool CreateDeviceD3D(HWND);
 	void CleanupDeviceD3D();
 	void CreateRenderTarget();
 	void CleanupRenderTarget();
-	LRESULT WINAPI WndProc(HWND, UINT, WPARAM, LPARAM);
+	static LRESULT WINAPI WndProc(HWND, UINT, WPARAM, LPARAM);
 
-    //Image loading functions
+	//Image loading function
 	ID3D11ShaderResourceView* LoadImageTexture(ID3D11Device* device, const wchar_t* filename);
-	ID3D11ShaderResourceView* LoadImageTexture(ID3D11Device* device, const wchar_t* filename, int* outWidth, int* outHeight);
 
 	//Rendering Functions
 	void initializeGUI();
 	void Render();
 
-	//Game related functions
-	//extern CGame* game;
-	void gameLoop();
-	void renderMap(ID3D11ShaderResourceView*);
-	void renderPlayers();
-		
-	//utility
-	//Convert the world position we read in to the 2d position on the map
-	void worldToRadar(float& x, float& y);
-	//The map bounds are the values we use to determine 2d position in worldToRadar
-	void loadMapBounds();
-	void loadTextures();
+	//load our map/icon images
+	void loadMaps();
+	void loadIcons();
+
 	ID3D11ShaderResourceView* fetchMap(std::string);
-}
-
-//This class holds the values we use to find our 2d map postion from our world postion
-class mapData {
-public:
-	float xBound;
-	float yBound;
-	float scale;
-
-	mapData();
-	mapData(float x, float y, float s);
 };
-
-//This holds an unordered map of our textures and mapData
-namespace maps {
-	extern float radarSize;
-	//values for knowing if player is 1st or 2nd floor on multi level maps
-	extern float vertigoZBound;
-	extern float nukeZBound;
-	extern std::unordered_map<std::string, ID3D11ShaderResourceView*> mapTextures;
-	extern std::unordered_map<std::string, mapData> mapBounds;
-}
-//Similar to the maps, this holds our weapon/inventory icons
-namespace icons {
-	extern float scale;
-	extern std::unordered_map<int, ID3D11ShaderResourceView*> iconTextures;
-	extern std::unordered_map<int, int> iconWidths;
-	extern std::unordered_map<int, int> iconHeights;
-}
 
