@@ -4,6 +4,8 @@ namespace memory {
 	HWND windowHandle = nullptr;
 	HANDLE processHandle = nullptr;
 	DWORD processID = 0;
+	uintptr_t matchmakingBase = 0;
+	uintptr_t moduleBase = 0;
 
 	//attach to our process
 	bool attachToProcess() {
@@ -13,6 +15,9 @@ namespace memory {
 		//We need a process handle to read memory from the process
 		processHandle = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, processID);
 		if (processHandle == nullptr) return false;
+		matchmakingBase = getModuleBase(L"matchmaking.dll");
+		moduleBase = getModuleBase(L"client.dll");
+
 		return true;
 	}
 

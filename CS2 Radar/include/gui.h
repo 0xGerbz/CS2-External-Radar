@@ -2,6 +2,7 @@
 #include "./ImGUI/imgui_impl_win32.h"
 #include "./ImGUI/imgui_impl_dx11.h"
 #include "./WICTextureLoader11.h"
+#include "game.h"
 
 #include <d3d11.h>
 #include <unordered_map>

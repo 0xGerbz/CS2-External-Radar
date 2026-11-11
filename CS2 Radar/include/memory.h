@@ -6,6 +6,8 @@ namespace memory {
 	extern HWND windowHandle;
 	extern HANDLE processHandle;
 	extern DWORD processID;
+	extern uintptr_t matchmakingBase;
+	extern uintptr_t moduleBase;
 
 	//attach to our process
 	bool attachToProcess();

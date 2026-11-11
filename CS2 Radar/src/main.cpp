@@ -11,8 +11,6 @@ int main(){
     //Attach to our process to prepare for memory reads
     memory::attachToProcess();
     //Testing our getMap function
-    Game g;
-    g.getMap();
     gui.Render();
     CoUninitialize();
     return 0;

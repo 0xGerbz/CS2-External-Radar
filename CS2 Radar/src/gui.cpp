@@ -30,6 +30,7 @@ void GUI::Render() {
 	ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.f);
 	loadMaps();
 	loadIcons();
+	Game g;
 	// Main loop - the structure of the main loop is given in the imgui example
 	bool done = false;
 	while (!done)
@@ -70,7 +71,8 @@ void GUI::Render() {
         // if(in game){
         //     gameloop
         // }
-
+		g.update();
+		
 
 		//Simple exit button example
 		//Define our size and margin(how far from the edge of the screen we want it)
