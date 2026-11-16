@@ -102,22 +102,29 @@ void GUI::Render() {
 		ImGui::End();
 		ImGui::PopStyleVar();
 
+		// Main Window 
+		static bool show_window = true;
+		
+		ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver); // Where the radar window will start.
+		ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver); // Radar window a starting size.
 
-		// Messing around with some imgui stuff to see what we can do. This is just a test window
-		// Where the radar window will start.
-		ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
+		if (show_window) {
+			if (ImGui::Begin("CS2Radar", &show_window)) { 	// Create a window called "CS2Radar" and append into it
+				if (ImGui::BeginTabBar("TabBar")) { // Create a tab bar container
+					if (ImGui::BeginTabItem("Radar")) { // Create a tab item called "Radar"
+						ImGui::Text("Radar will go here.");
+						ImGui::EndTabItem();
+					}
 
-		// Radar window a starting size.
-		ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
-
-		// Title of box
-		ImGui::Begin("Radar");
-
-		// Temporary text
-		ImGui::Text("Map will go here.");
-
-		// Every Begin() needs a matching End().
-		ImGui::End();
+					if (ImGui::BeginTabItem("Settings")) {
+						ImGui::Text("Settings will go here.");
+						ImGui::EndTabItem();
+					}
+					ImGui::EndTabBar();
+				}
+			}
+			ImGui::End(); // Every Begin() needs a matching End().
+		}
 
 		//Render - given in imgui example
 		ImGui::Render();
