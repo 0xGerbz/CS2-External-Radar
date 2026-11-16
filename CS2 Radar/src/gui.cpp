@@ -10,9 +10,6 @@ GUI::GUI() {
 	wc = {};
 	hwnd = NULL;
 }
-//We have to declare this globaly for our WndProc function
-UINT GUI::g_ResizeWidth = 0;
-UINT GUI::g_ResizeHeight = 0;
 
 map::map(float x, float y, float s, ID3D11ShaderResourceView* t) {
 	xOffset = x;
@@ -25,12 +22,15 @@ icon::icon(ID3D11ShaderResourceView* t) {
 	texture = t;
 }
 
+//We have to declare this globaly for our WndProc function
+UINT GUI::g_ResizeWidth = 0;
+UINT GUI::g_ResizeHeight = 0;
+
 //All of our rendering
 void GUI::Render() {
 	ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.f);
 	loadMaps();
 	loadIcons();
-	Game g;
 	// Main loop - the structure of the main loop is given in the imgui example
 	bool done = false;
 	while (!done)
@@ -66,36 +66,8 @@ void GUI::Render() {
 
 
 		//Where the magic happens
-		g.update();
-		
-
-		//Simple exit button example
-		//Define our size and margin(how far from the edge of the screen we want it)
-		const ImVec2 btnSize(100, 30);
-		const float margin = 10.0f;
-		ImVec2 display = ImGui::GetIO().DisplaySize;
-		//Set the window position x grows from left to right and y grows from TOP TO BOTTOM - kind of weird
-		ImGui::SetNextWindowPos(ImVec2(display.x - btnSize.x - margin, margin));
-		//Style options we can use. here we are turning setting a border and turning off padding on the button window
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		//Every imgui window/element will begin with a ImGui::Begin() call and end with ImGui::End()
-		ImGui::Begin("ExitButton", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
-		//we have to call popstyle var to reset to default after we changed the style variable in lines 101-102
-		ImGui::PopStyleVar();
-		//Set colors for the button
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.10f, 0.10f, 1.0f)); // normal
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.30f, 0.30f, 0.30f, 1.0f)); // hovered
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.20f, 0.20f, 1.0f)); // held down
-		//Make our button, will say exit
-		if (ImGui::Button("Exit", btnSize)) {
-			done = true;
-		}
-		//Pop colors
-		ImGui::PopStyleColor(3);
-		//End our window
-		ImGui::End();
-		ImGui::PopStyleVar();
+		renderGame();
+		exitButton(done);
 
 		// Main Window 
 		static bool show_window = true;
@@ -143,6 +115,43 @@ void GUI::Render() {
 	::UnregisterClassW(wc.lpszClassName, wc.hInstance);
 	return;
 }
+
+
+void GUI::renderGame() {
+
+}
+
+void GUI::exitButton(bool &exit) {
+	//Simple exit button example
+	//Define our size and margin(how far from the edge of the screen we want it)
+	const ImVec2 buttonSize(100, 30);
+	const float margin = 10.0f;
+	ImVec2 display = ImGui::GetIO().DisplaySize;
+	//Set the window position x grows from left to right and y grows from TOP TO BOTTOM - kind of weird
+	ImGui::SetNextWindowPos(ImVec2(display.x - buttonSize.x - margin, margin));
+	//Style options we can use. here we are turning setting a border and turning off padding on the button window
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	//Every imgui window/element will begin with a ImGui::Begin() call and end with ImGui::End()
+	ImGui::Begin("ExitButton", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
+	//we have to call popstyle var to reset to default after we changed the style variable
+	ImGui::PopStyleVar();
+	//Set colors for the button
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.10f, 0.10f, 1.0f)); // normal
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.30f, 0.30f, 0.30f, 1.0f)); // hovered
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.20f, 0.20f, 1.0f)); // held down
+	//Make our button, will say exit
+	if (ImGui::Button("Exit", buttonSize)) {
+		exit = true;
+	}
+	//Pop colors
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar();
+	//End our window
+	ImGui::End();
+}
+
+
 
 //Loading images
 ID3D11ShaderResourceView* GUI::LoadImageTexture(ID3D11Device* device, const wchar_t* filename)

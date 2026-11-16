@@ -66,6 +66,9 @@ struct GUI {
 	//Rendering Functions
 	void initializeGUI();
 	void Render();
+	
+	void renderGame();
+	void exitButton(bool&);
 
 	//load our map/icon images
 	void loadMaps();

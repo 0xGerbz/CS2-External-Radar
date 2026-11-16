@@ -5,9 +5,9 @@
 #include <cstdint>
 
 namespace client_dll {
-    constexpr std::ptrdiff_t dwEntityList = 0x271FBB8;
-    constexpr std::ptrdiff_t dwLocalPlayerController = 0x2542548;
-    constexpr std::ptrdiff_t dwLocalPlayerPawn = 0x256A948;
+    constexpr std::ptrdiff_t dwEntityList = 0x2709010;
+    constexpr std::ptrdiff_t dwLocalPlayerController = 0x252B0C8;
+    constexpr std::ptrdiff_t dwLocalPlayerPawn = 0x2553D38;
 
     constexpr std::ptrdiff_t m_hPlayerPawn = 0x92C;
     constexpr std::ptrdiff_t m_sSanitizedPlayerName = 0x878;
@@ -17,6 +17,6 @@ namespace client_dll {
 }
 
 namespace matchmaking_dll {
-    constexpr std::ptrdiff_t dwGameTypes = 0x1B0FD0;
+    constexpr std::ptrdiff_t dwGameTypes = 0x1AEFC0;
     constexpr std::ptrdiff_t dwGameTypes_mapName = 0x120;
 }
