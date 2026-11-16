@@ -66,11 +66,6 @@ void GUI::Render() {
 
 
 		//Where the magic happens
-
-		//Read in all info
-        // if(in game){
-        //     gameloop
-        // }
 		g.update();
 		
 
