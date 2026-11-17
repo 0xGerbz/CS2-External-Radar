@@ -69,9 +69,12 @@ void GUI::Render() {
 		renderGame();
 		exitButton(done);
 
-		// Main Window 
+		// Variables
 		static bool show_window = true;
-		
+		static bool enable_feature = false;
+		static float background_opacity = 1.0f;
+		// Window with changes to the radar
+		ImGui::SetNextWindowBgAlpha(background_opacity);
 		ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver); // Where the radar window will start.
 		ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver); // Radar window a starting size.
 
@@ -79,12 +82,17 @@ void GUI::Render() {
 			if (ImGui::Begin("CS2Radar", &show_window)) { 	// Create a window called "CS2Radar" and append into it
 				if (ImGui::BeginTabBar("TabBar")) { // Create a tab bar container
 					if (ImGui::BeginTabItem("Radar")) { // Create a tab item called "Radar"
-						ImGui::Text("Radar will go here.");
+						if (ImGui::Checkbox("Enable Feature", &enable_feature)) {
+							// anything
+						}
+
+						ImGui::Text("Radar Settings");
 						ImGui::EndTabItem();
 					}
 
 					if (ImGui::BeginTabItem("Settings")) {
-						ImGui::Text("Settings will go here.");
+						ImGui::Text("Overlay Settings");
+						ImGui::SliderFloat("Background Opacity", &background_opacity, 0.0f, 1.0f);
 						ImGui::EndTabItem();
 					}
 					ImGui::EndTabBar();
