@@ -22,6 +22,12 @@ icon::icon(ID3D11ShaderResourceView* t) {
 	texture = t;
 }
 
+// Variables
+static bool show_window = true;
+static bool enable_feature = false;
+static float background_opacity = 1.0f;
+static float radar_size = 1080.0f;
+
 //We have to declare this globaly for our WndProc function
 UINT GUI::g_ResizeWidth = 0;
 UINT GUI::g_ResizeHeight = 0;
@@ -69,10 +75,6 @@ void GUI::Render() {
 		renderGame();
 		exitButton(done);
 
-		// Variables
-		static bool show_window = true;
-		static bool enable_feature = false;
-		static float background_opacity = 1.0f;
 		// Window with changes to the radar
 		ImGui::SetNextWindowBgAlpha(background_opacity);
 		ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver); // Where the radar window will start.
@@ -82,6 +84,7 @@ void GUI::Render() {
 			if (ImGui::Begin("CS2Radar", &show_window)) { 	// Create a window called "CS2Radar" and append into it
 				if (ImGui::BeginTabBar("TabBar")) { // Create a tab bar container
 					if (ImGui::BeginTabItem("Radar")) { // Create a tab item called "Radar"
+						ImGui::SliderFloat("Radar Size", &radar_size, 100.0f, 2000.0f); // Slider for radar size
 						if (ImGui::Checkbox("Enable Feature", &enable_feature)) {
 							// anything
 						}
@@ -128,9 +131,9 @@ void GUI::Render() {
 void GUI::renderGame() {
 	Game g;
 	g.update();
-	int radarSize = 1080;
+	int radarSize = int(radar_size);
 	ImVec2 display = ImGui::GetIO().DisplaySize;
-	map currentMap = maps[g.map];
+	map currentMap = maps["de_dust2"]; // g.map
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::SetNextWindowPos(ImVec2((display.x / 2 - radarSize / 2), (display.y / 2 - radarSize / 2)));
