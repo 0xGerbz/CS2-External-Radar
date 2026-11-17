@@ -118,7 +118,21 @@ void GUI::Render() {
 
 
 void GUI::renderGame() {
+	Game g;
+	g.update();
+	int radarSize = 1080;
+	ImVec2 display = ImGui::GetIO().DisplaySize;
+	map currentMap = maps[g.map];
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::SetNextWindowPos(ImVec2((display.x / 2 - radarSize / 2), (display.y / 2 - radarSize / 2)));
+	ImGui::SetNextWindowSize(ImVec2(radarSize, radarSize));
+	ImGui::Begin("MAP", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+	ImGui::Image((void*)currentMap.texture, ImVec2(radarSize, radarSize));
+	ImGui::End();
+	ImGui::PopStyleVar(2);
 
+	//Player rendering will be a child of this window so we do it all here
 }
 
 void GUI::exitButton(bool &exit) {
