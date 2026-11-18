@@ -73,6 +73,7 @@ struct GUI {
 	//load our map/icon images
 	void loadMaps();
 	void loadIcons();
+	void worldToRadarPos(float&, float&, std::string);
 
 	ID3D11ShaderResourceView* fetchMap(std::string);
 };

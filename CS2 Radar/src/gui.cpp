@@ -132,23 +132,47 @@ void GUI::Render() {
 	return;
 }
 
+//Turn our 3D world position into our 2D map position
+void GUI::worldToRadarPos(float& x, float& y, std::string mapName) {
+	map currentMap = maps[mapName];
+	//Subtract our offsets from our world position
+	x -= currentMap.xOffset;
+	y -= currentMap.yOffset;
+	//Divide by the maps scale
+	x /= currentMap.scale;
+	y /= currentMap.scale;
+	//This lets us resize the radar. By default it is 1024x1024 pixels
+	x *= radar_size / 1024.f;
+	y *= radar_size / 1024.f;
+	y *= -1;
+}
 
 void GUI::renderGame() {
 	Game g;
 	g.update();
+	//Map rendering
 	int radarSize = int(radar_size);
 	ImVec2 display = ImGui::GetIO().DisplaySize;
-	map currentMap = maps["de_dust2"]; // g.map
+	map currentMap = maps[g.map]; // g.map
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::SetNextWindowPos(ImVec2((display.x / 2 - int(radar_x)), (display.y / 2 - int(radar_y) / 2)));
 	ImGui::SetNextWindowSize(ImVec2(radarSize, radarSize));
 	ImGui::Begin("MAP", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 	ImGui::Image((void*)currentMap.texture, ImVec2(radarSize, radarSize));
-	ImGui::End();
 	ImGui::PopStyleVar(2);
 
 	//Player rendering will be a child of this window so we do it all here
+	for (int i = 0; i < g.players.size(); i++) {
+		Player currentPlayer = g.players[i];
+		float x = currentPlayer.position.x;
+		float y = currentPlayer.position.y;
+		worldToRadarPos(x, y, g.map);
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		ImGui::GetForegroundDrawList()->AddCircleFilled(ImVec2((windowPos.x + x), (windowPos.y + y)), 8.0f, IM_COL32(255, 255, 255, 255));
+	}
+
+	ImGui::End();
 }
 
 void GUI::exitButton(bool &exit) {

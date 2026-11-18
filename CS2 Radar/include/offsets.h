@@ -5,9 +5,9 @@
 #include <cstdint>
 
 namespace client_dll {
-    constexpr std::ptrdiff_t dwEntityList = 0x2709010;
-    constexpr std::ptrdiff_t dwLocalPlayerController = 0x252B0C8;
-    constexpr std::ptrdiff_t dwLocalPlayerPawn = 0x2553D38;
+    constexpr std::ptrdiff_t dwEntityList = 0x270C680;
+    constexpr std::ptrdiff_t dwLocalPlayerController = 0x252ED78;
+    constexpr std::ptrdiff_t dwLocalPlayerPawn = 0x2557538;
 
     constexpr std::ptrdiff_t m_hPlayerPawn = 0x92C;
     constexpr std::ptrdiff_t m_sSanitizedPlayerName = 0x878;
