@@ -29,6 +29,10 @@ static float background_opacity = 1.0f;
 static float radar_size = 1000.0f;
 static float radar_x = 540.0f;
 static float radar_y = 960.0f;
+static bool show_player_names = true;
+static bool show_health = true;
+static bool show_aim_lines = true;
+static bool show_weapons = true;
 
 //We have to declare this globaly for our WndProc function
 UINT GUI::g_ResizeWidth = 0;
@@ -53,7 +57,6 @@ void GUI::Render() {
 			if (msg.message == WM_QUIT || exitRequested) {
 				done = true;
 			}
-
 		}
 		if (done)
 			break;
@@ -72,7 +75,6 @@ void GUI::Render() {
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-
 		//Where the magic happens
 		renderGame();
 		exitButton(done);
@@ -89,12 +91,19 @@ void GUI::Render() {
 						ImGui::SliderFloat("Radar X", &radar_x, 0.0f, 1080.0f); // Slider for radar X
 						ImGui::SliderFloat("Radar Y", &radar_y, 0.0f, 1920.0f); // Slider for radar Y
 						ImGui::SliderFloat("Radar Size", &radar_size, 100.0f, 2000.0f); // Slider for radar size
-
-						if (ImGui::Checkbox("Enable Feature", &enable_feature)) {
-							// anything
+						// Checkboxes for various radar features
+						if (ImGui::Checkbox("Player Names", &show_player_names)) {
+							
 						}
-
-						ImGui::Text("Radar Settings");
+						if (ImGui::Checkbox("Health", &show_health)) {
+							
+						}
+						if (ImGui::Checkbox("Aim Lines", &show_aim_lines)) {
+							
+						}
+						if (ImGui::Checkbox("Weapons", &show_weapons)) {
+							
+						}
 						ImGui::EndTabItem();
 					}
 
@@ -120,7 +129,6 @@ void GUI::Render() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
-
 	// Cleanup - given in imgui example
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
@@ -131,7 +139,6 @@ void GUI::Render() {
 	::UnregisterClassW(wc.lpszClassName, wc.hInstance);
 	return;
 }
-
 
 void GUI::renderGame() {
 	Game g;
@@ -151,7 +158,7 @@ void GUI::renderGame() {
 	//Player rendering will be a child of this window so we do it all here
 }
 
-void GUI::exitButton(bool &exit) {
+void GUI::exitButton(bool& exit) {
 	//Simple exit button example
 	//Define our size and margin(how far from the edge of the screen we want it)
 	const ImVec2 buttonSize(100, 30);
@@ -181,8 +188,6 @@ void GUI::exitButton(bool &exit) {
 	ImGui::End();
 }
 
-
-
 //Loading images
 ID3D11ShaderResourceView* GUI::LoadImageTexture(ID3D11Device* device, const wchar_t* filename)
 {
@@ -203,7 +208,6 @@ ID3D11ShaderResourceView* GUI::LoadImageTexture(ID3D11Device* device, const wcha
 
 	return texture;
 }
-
 
 //Helpers - All of the following functions are given in imgui example
 //Init
@@ -229,17 +233,14 @@ void GUI::initializeGUI() {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
-
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
-
 }
-bool GUI::CreateDeviceD3D(HWND hWnd){
+bool GUI::CreateDeviceD3D(HWND hWnd) {
 	// Setup swap chain
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
@@ -270,23 +271,23 @@ bool GUI::CreateDeviceD3D(HWND hWnd){
 	CreateRenderTarget();
 	return true;
 }
-void GUI::CleanupDeviceD3D(){
+void GUI::CleanupDeviceD3D() {
 	CleanupRenderTarget();
 	if (g_pSwapChain) { g_pSwapChain->Release(); g_pSwapChain = nullptr; }
 	if (g_pd3dDeviceContext) { g_pd3dDeviceContext->Release(); g_pd3dDeviceContext = nullptr; }
 	if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = nullptr; }
 }
-void GUI::CreateRenderTarget(){
+void GUI::CreateRenderTarget() {
 	ID3D11Texture2D* pBackBuffer;
 	g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
 	g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView);
 	pBackBuffer->Release();
 }
-void GUI::CleanupRenderTarget(){
+void GUI::CleanupRenderTarget() {
 	if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = nullptr; }
 }
 //Handles resizing, minimizing, exiting window
-LRESULT WINAPI GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
+LRESULT WINAPI GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 		return true;
 
@@ -312,5 +313,4 @@ LRESULT WINAPI GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		return 0;
 	}
 	return ::DefWindowProcW(hWnd, msg, wParam, lParam);
-
 }
