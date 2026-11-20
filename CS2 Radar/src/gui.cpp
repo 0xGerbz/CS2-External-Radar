@@ -150,10 +150,19 @@ void GUI::worldToRadarPos(float& x, float& y, std::string mapName) {
 void GUI::renderGame() {
 	Game g;
 	g.update();
+	std::string mapName = g.map;
+	//We need to check our local players Z position to determine what floor we are on in multi floor maps
+	//I found the exact Z position to change floors by testing in game and monotoring my world position value
+	if (mapName == "de_vertigo") {
+		if (g.localPlayer.position.z <= 11700) mapName = "de_vertigo_lower";
+	}
+	if (mapName == "de_nuke") {
+		if (g.localPlayer.position.z <= -495) mapName = "de_nuke_lower";
+	}
 	//Map rendering
 	int radarSize = int(radar_size);
 	ImVec2 display = ImGui::GetIO().DisplaySize;
-	map currentMap = maps[g.map]; // g.map
+	map currentMap = maps[mapName];
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::SetNextWindowPos(ImVec2((display.x / 2 - int(radar_x)), (display.y / 2 - int(radar_y) / 2)));
@@ -165,11 +174,75 @@ void GUI::renderGame() {
 	//Player rendering will be a child of this window so we do it all here
 	for (int i = 0; i < g.players.size(); i++) {
 		Player currentPlayer = g.players[i];
+
+		//Skip dead players
+		if (currentPlayer.controller == NULL) continue;
+		if (currentPlayer.health == 0) continue;
+
+		//grab our position and convert to 2D with our world to radar function
 		float x = currentPlayer.position.x;
 		float y = currentPlayer.position.y;
 		worldToRadarPos(x, y, g.map);
 		ImVec2 windowPos = ImGui::GetWindowPos();
-		ImGui::GetForegroundDrawList()->AddCircleFilled(ImVec2((windowPos.x + x), (windowPos.y + y)), 8.0f, IM_COL32(255, 255, 255, 255));
+		ImU32 dotColor;
+		float opacity = 255;
+	
+		//Set our opacity - we only need this for multi-level maps (nuke/vertigo)
+		//People on different levels than the local with have a lower opacity
+		if (mapName == "de_nuke" || mapName == "de_nuke_lower") {
+			if (g.localPlayer.position.z < -495 && currentPlayer.position.z >= -495) opacity = 155;
+			if (g.localPlayer.position.z >= -495 && currentPlayer.position.z < -495) opacity = 155;
+		}
+		if (mapName == "de_vertigo" || mapName == "de_vertigo_lower") {
+			if (g.localPlayer.position.z < 11700 && currentPlayer.position.z >= 11700) opacity = 155;
+			if (g.localPlayer.position.z >= 11700 && currentPlayer.position.z < 11700) opacity = 155;
+		}
+
+		//Set our dot color - only for team, enemies will always be red
+		if (currentPlayer.team == g.localPlayer.team) {
+			//Grey
+			if(currentPlayer.color == -1) dotColor = IM_COL32(128, 128, 128, opacity);
+			//Blue
+			if(currentPlayer.color == 0) dotColor = IM_COL32(60, 140, 255, opacity);
+			//Green
+			if(currentPlayer.color == 1) dotColor = IM_COL32(40, 200, 90, opacity);
+			//yellow
+			if(currentPlayer.color == 2) dotColor = IM_COL32(255, 255, 0, opacity);
+			//Orange
+			if(currentPlayer.color == 3) dotColor = IM_COL32(250, 130, 2, opacity);
+			//Purple
+			if(currentPlayer.color == 4) dotColor = IM_COL32(180, 80, 230, opacity);
+			
+			if(currentPlayer.controller == g.localPlayer.controller) dotColor = IM_COL32(255, 255, 255, opacity);
+		}
+
+
+		//aim lines. We render them before the player dot so they remain under the dot
+		float angle = currentPlayer.viewAngle.y;
+		//convert to radians
+		angle = angle * 3.14159265f / 180.0f;
+		float xDirection = cos(angle);
+		//Have to flip our Y sign
+		float yDirection = sin(angle) * -1;
+		float length = 60;
+		float xEndpoint = windowPos.x + x + xDirection * length;
+		float yEndpoint = windowPos.y + y + yDirection * length;
+		ImGui::GetForegroundDrawList()->AddLine(ImVec2((windowPos.x + x), (windowPos.y + y)), ImVec2(xEndpoint, yEndpoint), IM_COL32(0, 0, 0, opacity), 7.5f);
+		ImGui::GetForegroundDrawList()->AddLine(ImVec2((windowPos.x + x), (windowPos.y + y)), ImVec2(xEndpoint, yEndpoint), IM_COL32(255, 255, 255, opacity), 4.0f);
+
+
+		//We will be representing players as dots
+		//Add a black outline to player circles. We do this first so we draw a smaller colored circle on top of it
+		ImGui::GetForegroundDrawList()->AddCircleFilled(ImVec2((windowPos.x + x), (windowPos.y + y)), 13.0f, IM_COL32(0, 0, 0, 255));
+		//Draw a red dot for enemies
+		if (currentPlayer.team != g.localPlayer.team) {
+			ImGui::GetForegroundDrawList()->AddCircleFilled(ImVec2((windowPos.x + x), (windowPos.y + y)), 10.0f, IM_COL32(255, 0, 0, opacity));
+		}
+		else {
+			ImGui::GetForegroundDrawList()->AddCircleFilled(ImVec2((windowPos.x + x), (windowPos.y + y)), 10.0f, dotColor);
+		}
+
+		//Weapons will go here
 	}
 
 	ImGui::End();

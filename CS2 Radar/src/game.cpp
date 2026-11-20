@@ -39,6 +39,15 @@ uintptr_t Game::getEntityFromHandle(uint32_t handle) {
 }
 
 void Game::getPlayers() {
+	//Get Local player first
+	localPlayer.controller = memory::memRead<uintptr_t>(memory::moduleBase + client_dll::dwLocalPlayerController);
+	localPlayer.pawn = memory::memRead<uintptr_t>(memory::moduleBase + client_dll::dwLocalPlayerPawn);
+	//Local team
+	localPlayer.team = memory::memRead<uint8_t>(localPlayer.controller + client_dll::m_iTeamNum);
+	//Position
+	memory::memRead(localPlayer.pawn + client_dll::m_vOldOrigin, &localPlayer.position, sizeof(vector3));
+
+	//Loop through player indices and read data we want
 	for (int i = 1; i <= 64; i++) {
 		//Start out by getting each players controller and pawn
 		Player p;
@@ -61,6 +70,11 @@ void Game::getPlayers() {
 		//Player position
 		memory::memRead(p.pawn + client_dll::m_vOldOrigin, &p.position, sizeof(vector3));
 
+		//Player color
+		p.color = memory::memRead<int32_t>(p.controller + client_dll::m_iCompTeammateColor);
+
+		//View Angles
+		memory::memRead(p.pawn + client_dll::m_angEyeAngles, &p.viewAngle, sizeof(vector3));
 
 		players.push_back(p);
 	}

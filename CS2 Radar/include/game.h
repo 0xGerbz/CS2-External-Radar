@@ -20,6 +20,8 @@ struct Player {
 	uint8_t team;
 	int32_t health;
 	vector3 position;
+	int32_t color;
+	vector3 viewAngle;
 
 };
 
