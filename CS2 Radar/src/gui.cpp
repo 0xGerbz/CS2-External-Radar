@@ -144,6 +144,7 @@ void GUI::worldToRadarPos(float& x, float& y, std::string mapName) {
 	//This lets us resize the radar. By default it is 1024x1024 pixels
 	x *= radar_size / 1024.f;
 	y *= radar_size / 1024.f;
+	//ImGUI flips the y axis so we multiply by -1wq
 	y *= -1;
 }
 
@@ -236,6 +237,38 @@ void GUI::renderGame() {
 		//We will be representing players as dots
 		//Add a black outline to player circles. We do this first so we draw a smaller colored circle on top of it
 		ImGui::GetForegroundDrawList()->AddCircleFilled(ImVec2((windowPos.x + x), (windowPos.y + y)), 13.0f, IM_COL32(0, 0, 0, 255));
+
+		//We render the health as a ring around our player dot
+		if (show_health) {
+			float ringThickness = 3.0f;
+			float ringRadius = 10.0f + ringThickness * 0.5f;
+			float healthValue = currentPlayer.health / 100.0f; 
+			ImU32 ringColor;
+			//Change the color based on how much health we have
+			if (currentPlayer.health > 66) {
+				ringColor = IM_COL32(0, 255, 0, opacity); //Green
+			}
+			else if (currentPlayer.health > 33) {
+				ringColor = IM_COL32(255, 255, 0, opacity); //Yellow
+			}
+			else ringColor = IM_COL32(255, 128, 0, opacity); //Orange
+
+			if (healthValue >= 1.0f) {
+				//We can just render a full circle at 100 health
+				ImGui::GetForegroundDrawList()->AddCircle(ImVec2(windowPos.x + x, windowPos.y + y), ringRadius, ringColor, 32, ringThickness);
+			}
+			//Ai was used to help with the math on this
+			else {
+				// Pi / 2 will give us the 12 o clock position. Unit circle. We multiply by -1 because imgui flips the y axis
+				float start = -3.14159265f * 0.5f;
+				// now we do 2 * Pi radians to get the circle's end point. Multiplying by our health value gives us the endpoint of the arc. When at 100, we just have 2 * Pi
+				float end = start + 2.0f * 3.14159265f * healthValue;
+				ImGui::GetForegroundDrawList()->PathArcTo(ImVec2(windowPos.x + x, windowPos.y + y), ringRadius, start, end, 32);
+				ImGui::GetForegroundDrawList()->PathStroke(ringColor, 0, ringThickness);   // 0 = open path
+			}
+		}
+
+		//Draw our player dots
 		//Draw a red dot for enemies
 		if (currentPlayer.team != g.localPlayer.team) {
 			ImGui::GetForegroundDrawList()->AddCircleFilled(ImVec2((windowPos.x + x), (windowPos.y + y)), 10.0f, IM_COL32(255, 0, 0, opacity));
