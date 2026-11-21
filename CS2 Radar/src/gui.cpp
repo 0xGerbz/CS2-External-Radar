@@ -92,18 +92,10 @@ void GUI::Render() {
 						ImGui::SliderFloat("Radar Y", &radar_y, 0.0f, 1920.0f); // Slider for radar Y
 						ImGui::SliderFloat("Radar Size", &radar_size, 100.0f, 2000.0f); // Slider for radar size
 						// Checkboxes for various radar features
-						if (ImGui::Checkbox("Player Names", &show_player_names)) {
-							
-						}
-						if (ImGui::Checkbox("Health", &show_health)) {
-							
-						}
-						if (ImGui::Checkbox("Aim Lines", &show_aim_lines)) {
-							
-						}
-						if (ImGui::Checkbox("Weapons", &show_weapons)) {
-							
-						}
+						ImGui::Checkbox("Player Names", &show_player_names);
+						ImGui::Checkbox("Health", &show_health);
+						ImGui::Checkbox("Aim Lines", &show_aim_lines);
+						ImGui::Checkbox("Weapons", &show_weapons);
 						ImGui::EndTabItem();
 					}
 
@@ -226,17 +218,19 @@ void GUI::renderGame() {
 
 
 		//aim lines. We render them before the player dot so they remain under the dot
-		float angle = currentPlayer.viewAngle.y;
-		//convert to radians
-		angle = angle * 3.14159265f / 180.0f;
-		float xDirection = cos(angle);
-		//Have to flip our Y sign
-		float yDirection = sin(angle) * -1;
-		float length = 60;
-		float xEndpoint = windowPos.x + x + xDirection * length;
-		float yEndpoint = windowPos.y + y + yDirection * length;
-		ImGui::GetForegroundDrawList()->AddLine(ImVec2((windowPos.x + x), (windowPos.y + y)), ImVec2(xEndpoint, yEndpoint), IM_COL32(0, 0, 0, opacity), 7.5f);
-		ImGui::GetForegroundDrawList()->AddLine(ImVec2((windowPos.x + x), (windowPos.y + y)), ImVec2(xEndpoint, yEndpoint), IM_COL32(255, 255, 255, opacity), 4.0f);
+		if (show_aim_lines) {
+			float angle = currentPlayer.viewAngle.y;
+			//convert to radians
+			angle = angle * 3.14159265f / 180.0f;
+			float xDirection = cos(angle);
+			//Have to flip our Y sign
+			float yDirection = sin(angle) * -1;
+			float length = 60;
+			float xEndpoint = windowPos.x + x + xDirection * length;
+			float yEndpoint = windowPos.y + y + yDirection * length;
+			ImGui::GetForegroundDrawList()->AddLine(ImVec2((windowPos.x + x), (windowPos.y + y)), ImVec2(xEndpoint, yEndpoint), IM_COL32(0, 0, 0, opacity), 7.5f);
+			ImGui::GetForegroundDrawList()->AddLine(ImVec2((windowPos.x + x), (windowPos.y + y)), ImVec2(xEndpoint, yEndpoint), IM_COL32(255, 255, 255, opacity), 4.0f);
+		}
 
 
 		//We will be representing players as dots
